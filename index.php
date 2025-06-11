@@ -1,7 +1,9 @@
 <?php
 require_once('controllers/AuthController.php');
-require_once('middlewares/CorsMiddleware.php'); // à décommenter si tu veux les CORS
-CorsMiddleware::apply(); // Idem ici
+require_once('controllers/UserController.php');
+require_once('middlewares/CorsMiddleware.php');
+require_once('middlewares/AuthMiddleware.php');
+CorsMiddleware::apply();
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -32,7 +34,10 @@ try {
                 case 'verifyEmail':
                     (new AuthController())->verifyEmail($_GET);
                     exit;
-                // Ajoute d'autres actions GET ici
+                case 'updateEmail':
+                    AuthMiddleware::check();
+                    (new AuthController())->confirmEmailUpdate($body);
+                    exit;
                 default:
                     unknownAction('GET');
                     exit;
@@ -47,7 +52,17 @@ try {
                 case 'login':
                     (new AuthController())->login($body);
                     exit;
-                // Ajoute d'autres actions POST ici
+                case 'logout':
+                    AuthMiddleware::check();
+                    (new AuthController())->logout($body);
+                    exit;
+                case 'logoutAll':
+                    AuthMiddleware::check();
+                    (new AuthController())->logoutAll($body);
+                    exit;
+                case 'requestPasswordReset':
+                    (new AuthController())->requestPasswordReset($body);
+                    exit;
                 default:
                     unknownAction('POST');
                     exit;
@@ -56,7 +71,13 @@ try {
         case 'PUT':
             $action = $body['action'] ?? $_REQUEST['action'] ?? null;
             switch ($action) {
-                // Ajoute des actions PUT ici
+                case 'resetPassword':
+                    (new AuthController())->resetPassword($body);
+                    exit;
+                case 'updateEmail':
+                    AuthMiddleware::check();
+                    (new AuthController())->requestEmailUpdate($body);
+                    exit;
                 default:
                     unknownAction('PUT');
                     exit;
@@ -65,7 +86,10 @@ try {
         case 'DELETE':
             $action = $body['action'] ?? $_REQUEST['action'] ?? null;
             switch ($action) {
-                // Ajoute des actions DELETE ici
+                case 'deleteAccount':
+                    AuthMiddleware::check();
+                    (new UserController())->deleteAccount($body);
+                    exit;
                 default:
                     unknownAction('DELETE');
                     exit;
