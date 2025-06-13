@@ -294,5 +294,38 @@ class AuthController
 
         echo json_encode(['success' => true, 'message' => 'Adresse e-mail modifiée et confirmée !']);
     }
+
+    public function me()
+    {
+        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
+        if (!$sessionId) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Non authentifié']);
+            exit;
+        }
+
+        $sessionService = new SessionService();
+        $userId = $sessionService->getUserIdFromSession($sessionId);
+
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Session invalide']);
+            exit;
+        }
+
+        $authService = new AuthService();
+        $user = $authService->getUserById($userId);
+
+        if (!$user) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Utilisateur non trouvé']);
+            exit;
+        }
+
+        // On filtre les infos sensibles avant de renvoyer
+        unset($user['password_hash']);
+
+        echo json_encode(['success' => true, 'user' => $user]);
+    }
 }
 ?>
