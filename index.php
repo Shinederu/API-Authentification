@@ -38,6 +38,10 @@ try {
                     AuthMiddleware::check();
                     (new AuthController())->confirmEmailUpdate($body);
                     exit;
+                case 'me':
+                    AuthMiddleware::check();
+                    (new AuthController())->me();
+                    exit;
                 default:
                     unknownAction('GET');
                     exit;
