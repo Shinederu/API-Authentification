@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Inscription</title>
+<style>
+body{font-family:Arial;margin:2em;background:#f7f7f7}
+form{background:#fff;padding:1em;border-radius:5px;max-width:300px;margin:auto}
+input{display:block;margin-bottom:1em;width:100%;padding:.5em}
+button{padding:.5em 1em}
+</style>
+</head>
+<body>
+<h2>Inscription</h2>
+<form id="regForm">
+<input type="text" name="username" placeholder="Pseudo" required>
+<input type="email" name="email" placeholder="Email" required>
+<input type="password" name="password" placeholder="Mot de passe" required>
+<button type="submit">S'inscrire</button>
+</form>
+<script>
+document.getElementById('regForm').addEventListener('submit', async e => {
+ e.preventDefault();
+ const data = Object.fromEntries(new FormData(e.target).entries());
+ data.action = 'register';
+ const r = await fetch('API/index.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const res = await r.json();
+ alert(res.message || (res.success ? 'Inscription réussie' : res.error));
+});
+</script>
+</body>
+</html>
