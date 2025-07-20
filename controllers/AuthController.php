@@ -74,23 +74,6 @@ class AuthController
     }
 
     /**
-     * Annulation de l'inscription via lien (GET /?action=cancelRegistration&token=...)
-     */
-    public function cancelRegistration(array $params)
-    {
-        $input = sanitizeVerifyEmailInput($params);
-        $token = $input['token'];
-
-        $auth = new AuthService();
-        if ($auth->cancelRegistration($token)) {
-            echo json_encode(['success' => true, 'message' => "Inscription annulée"]);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'Lien invalide ou expiré']);
-        }
-    }
-
-    /**
      * Connexion
      */
     public function login(array $data)
@@ -109,9 +92,8 @@ class AuthController
         }
 
         if (!$user['email_verified']) {
-            $auth->resendVerificationEmail($user['id'], $user['email']);
             http_response_code(403);
-            echo json_encode(['error' => 'Email non vérifié. Un nouveau lien de vérification a été envoyé.']);
+            echo json_encode(['error' => 'Email non vérifié']);
             exit;
         }
 
