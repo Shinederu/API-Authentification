@@ -67,7 +67,7 @@ class AuthService
      * Génère et stocke un token de vérification d'email pour un utilisateur.
      * Retourne le token généré.
      */
-    public function createEmailVerificationToken(int $userId, string $newEmail = null): string
+    public function createEmailVerificationToken(int $userId, ?string $newEmail = null): string
     {
         $token = TokenService::generateToken(64);
         $expiresAt = date('Y-m-d H:i:s', strtotime('+1 day'));
@@ -208,6 +208,48 @@ class AuthService
     public function consumeEmailVerificationToken(string $token)
     {
         $this->db->delete('email_verification_tokens', ['token' => $token]);
+    }
+
+    // Envoie un nouvel e-mail de vérification
+    public function resendVerificationEmail(int $userId, string $email): void
+    {
+        $token = $this->createEmailVerificationToken($userId);
+        $link = "https://auth.shinederu.lol/?action=verifyEmail&token=$token";
+        MailService::send(
+            $email,
+            'Vérification de votre compte',
+            "Bienvenue! Cliquez ici pour vérifier votre adresse : $link"
+        );
+    }
+
+    // Annule l'inscription d'un utilisateur via le token de vérification
+    public function cancelRegistration(string $token): bool
+    {
+        $record = $this->db->get('email_verification_tokens', '*', ['token' => $token]);
+        if (!$record) {
+            return false;
+        }
+        $this->db->delete('users', ['id' => $record['user_id'], 'email_verified' => 0]);
+        $this->consumeEmailVerificationToken($token);
+        return true;
+    }
+
+    public function updateUsername(int $userId, string $username): bool
+    {
+        $this->db->update('users', ['username' => $username], ['id' => $userId]);
+        return $this->db->error === null;
+    }
+
+    public function updateAvatar(int $userId, string $avatarUrl): bool
+    {
+        $this->db->update('users', ['avatar_url' => $avatarUrl], ['id' => $userId]);
+        return $this->db->error === null;
+    }
+
+    public function updateUserRole(int $userId, string $role): bool
+    {
+        $this->db->update('users', ['role' => $role], ['id' => $userId]);
+        return $this->db->error === null;
     }
 
 
