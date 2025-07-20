@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/controllers/AuthController.php';
-require_once __DIR__ . '/controllers/UserController.php';
-require_once __DIR__ . '/middlewares/CorsMiddleware.php';
-require_once __DIR__ . '/middlewares/AuthMiddleware.php';
+require_once('controllers/AuthController.php');
+require_once('controllers/UserController.php');
+require_once('middlewares/CorsMiddleware.php');
+require_once('middlewares/AuthMiddleware.php');
 CorsMiddleware::apply();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -34,9 +34,6 @@ try {
                 case 'verifyEmail':
                     (new AuthController())->verifyEmail($_GET);
                     exit;
-                case 'cancelRegistration':
-                    (new AuthController())->cancelRegistration($_GET);
-                    exit;
                 case 'updateEmail':
                     AuthMiddleware::check();
                     (new AuthController())->confirmEmailUpdate($body);
@@ -44,10 +41,6 @@ try {
                 case 'me':
                     AuthMiddleware::check();
                     (new AuthController())->me();
-                    exit;
-                case 'profile':
-                    AuthMiddleware::check();
-                    (new UserController())->getProfile();
                     exit;
                 default:
                     unknownAction('GET');
@@ -88,10 +81,6 @@ try {
                 case 'updateEmail':
                     AuthMiddleware::check();
                     (new AuthController())->requestEmailUpdate($body);
-                    exit;
-                case 'updateProfile':
-                    AuthMiddleware::check();
-                    (new UserController())->updateProfile($body);
                     exit;
                 default:
                     unknownAction('PUT');
