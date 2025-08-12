@@ -16,7 +16,7 @@ class MailService
         $mail->SMTPAuth = SMTP_AUTH;
         $mail->Username = SMTP_USER;
         $mail->Password = SMTP_PASS;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = SMTP_PORT;
 
         $mail->CharSet = 'UTF-8';
@@ -40,7 +40,6 @@ class MailService
         try {
             return $mail->send();
         } catch (Exception $e) {
-            // Tu peux logger l’erreur ici si besoin ($mail->ErrorInfo)
             return false;
         }
     }
