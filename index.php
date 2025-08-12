@@ -38,6 +38,9 @@ try {
                     AuthMiddleware::check();
                     (new AuthController())->confirmEmailUpdate($body);
                     exit;
+                case 'revokeRegister':
+                    (new AuthController())->revokeRegister($_GET);
+                    exit;
                 case 'me':
                     AuthMiddleware::check();
                     (new AuthController())->me();

@@ -6,7 +6,7 @@ Ci dessous se trouve la liste des objectifs de cet API, avec leur avancement res
 - [ ] Inscription
     - [X] Vérification de l'Email
     - [ ] Renvoyer l'Email de vérification en cas de tentative de login
-    - [ ] Annuler l'inscription
+    - [X] Annuler l'inscription
 - [X] Connexion
     - [X] Via Email
     - [X] Via Username

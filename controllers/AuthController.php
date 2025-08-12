@@ -44,14 +44,32 @@ class AuthController
         // Génère le token de vérif + envoie le mail
         $token = $auth->createEmailVerificationToken($userId);
         $link = "https://auth.shinederu.lol/?action=verifyEmail&token=$token";
+        $link2 = "https://auth.shinederu.lol/?action=revokeRegister&token=$token";
 
         MailService::send(
             $email,
             "Vérification de votre compte",
-            "Bienvenue ! Cliquez ici pour vérifier votre adresse : $link"
+            "Bienvenue ! Merci pour votre inscription. Afin de verifier votre Email, merci de cliquer sur le lien suivant: $link \n \n Dans le cas où vous n'avez pas demandé a vous inscrire, vous pouvez annuler cette inscription via le lien suivant: $link2"
         );
 
         echo json_encode(['success' => true, 'message' => 'Inscription réussie, vérifiez votre email !']);
+    }
+
+    public function revokeRegister(array $params)
+    {
+        $input = sanitizeVerifyEmailInput($params);
+        $token = $input['token'];
+
+        $auth = new AuthService();
+
+        $ok = $auth->revokeRegister($token);
+        if (!$ok) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Lien invalide ou expiré']);
+            exit;
+        }
+
+        echo json_encode(['success' => true, 'message' => 'L\'inscription a bien été annulée']);
     }
 
     /**
