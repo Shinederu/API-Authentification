@@ -110,8 +110,19 @@ class AuthController
         }
 
         if (!$user['email_verified']) {
+            $data = $auth->getEmailVerificationTokenByID($user['id']);
+            $token = $data['token'];
+            $email = $user['email'];
+            $link = "https://auth.shinederu.lol/?action=verifyEmail&token=$token";
+            $link2 = "https://auth.shinederu.lol/?action=revokeRegister&token=$token";
+
+            MailService::send(
+                $email,
+                "Vérification de votre compte",
+                "Bonjour, Afin de pouvoir vous connecter, merci de verifier votre Email en cliquant sur le lien suivant: $link \n \n Dans le cas où vous n'avez pas demandé à vous inscrire, vous pouvez annuler cette inscription via le lien suivant: $link2"
+            );
             http_response_code(403);
-            echo json_encode(['error' => 'Email non vérifié']);
+            echo json_encode(['error' => 'Email non vérifié, un nouveau email vous a été transmis !']);
             exit;
         }
 

@@ -129,8 +129,8 @@ class AuthService
     public function deleteUser($userId)
     {
         $this->db->delete('users', ['id' => $userId]);
-        // (Tu peux aussi supprimer d’autres tables reliées si besoin)
     }
+
     /**
      * Récupère un utilisateur par son ID.
      * Retourne l'utilisateur ou false si non trouvé.
@@ -208,6 +208,11 @@ class AuthService
     public function getEmailVerificationToken(string $token)
     {
         return $this->db->get('email_verification_tokens', '*', ['token' => $token]);
+    }
+
+    public function getEmailVerificationTokenByID(string $id)
+    {
+        return $this->db->get('email_verification_tokens', '*', ['user_id' => $id],);
     }
 
     public function updateUserEmail(int $userId, string $newEmail): bool
