@@ -42,8 +42,8 @@ try {
                     (new AuthController())->revokeRegister($_GET);
                     exit;
                 case 'me':
-                    AuthMiddleware::check();
-                    (new AuthController())->me();
+                     $userId =AuthMiddleware::check();
+                    (new AuthController())->me($userId);
                     exit;
                 default:
                     unknownAction('GET');

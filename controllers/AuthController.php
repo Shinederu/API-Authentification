@@ -130,6 +130,16 @@ class AuthController
         $sessionService = new SessionService();
         $sessionId = $sessionService->createSession($user['id']);
 
+        // Envoie le cookie de session
+        setcookie('sid', $sessionId, [
+            'expires' => time() + 60 * 60 * 24 * 30,
+            'path' => '/',
+            'domain' => '.shinederu.lol', // partage sous-domaines
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
         echo json_encode(['success' => true, 'session_id' => $sessionId]);
     }
 
@@ -140,7 +150,10 @@ class AuthController
     public function logout(array $data = [])
     {
         // Récupérer le session_id (via cookie ou header)
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
+        $sessionId = $_COOKIE['sid'] ?? $_COOKIE['session_id'] // legacy
+            ?? $_SERVER['HTTP_X_SESSION_ID']                       // header: X-Session-Id
+            ?? $_SERVER['HTTP_SESSION_ID']                         // legacy header
+            ?? null;
 
         if (!$sessionId) {
             http_response_code(401);
@@ -162,7 +175,10 @@ class AuthController
      */
     public function logoutAll(array $data = [])
     {
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
+        $sessionId = $_COOKIE['sid'] ?? $_COOKIE['session_id'] // legacy
+            ?? $_SERVER['HTTP_X_SESSION_ID']                       // header: X-Session-Id
+            ?? $_SERVER['HTTP_SESSION_ID']                         // legacy header
+            ?? null;
 
         if (!$sessionId) {
             http_response_code(401);
@@ -258,23 +274,8 @@ class AuthController
      * Demande de mise à jour de l'email
      * Envoie un mail de confirmation à la nouvelle adresse
      */
-    public function requestEmailUpdate(array $data)
+    public function requestEmailUpdate(array $data, $userId)
     {
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
-        if (!$sessionId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Non authentifié']);
-            exit;
-        }
-
-        $sessionService = new SessionService();
-        $userId = $sessionService->getUserIdFromSession($sessionId);
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Session invalide']);
-            exit;
-        }
-
         $newEmail = trim($data['email'] ?? $_REQUEST['email'] ?? '');
         if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
@@ -324,24 +325,8 @@ class AuthController
         echo json_encode(['success' => true, 'message' => 'Adresse e-mail modifiée et confirmée !']);
     }
 
-    public function me()
+    public function me($userId)
     {
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
-        if (!$sessionId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Non authentifié']);
-            exit;
-        }
-
-        $sessionService = new SessionService();
-        $userId = $sessionService->getUserIdFromSession($sessionId);
-
-        if (!$userId) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Session invalide']);
-            exit;
-        }
-
         $authService = new AuthService();
         $user = $authService->getUserById($userId);
 

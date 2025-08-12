@@ -9,8 +9,11 @@ class AuthMiddleware
      */
     public static function check(): int
     {
-        // Récupère le session_id (via cookie ou header, à adapter à ton besoin)
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
+        // Récupère le session_id (via cookie ou header)
+        $sessionId = $_COOKIE['sid'] ?? $_COOKIE['session_id'] // legacy
+            ?? $_SERVER['HTTP_X_SESSION_ID']                       // header: X-Session-Id
+            ?? $_SERVER['HTTP_SESSION_ID']                         // legacy header
+            ?? null;
 
         if (!$sessionId) {
             http_response_code(401);
@@ -27,7 +30,6 @@ class AuthMiddleware
             exit;
         }
 
-        // Tu peux faire passer le user_id à la suite comme tu veux (ex : global, request, etc.)
         return $userId;
     }
 }
