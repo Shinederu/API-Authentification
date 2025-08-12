@@ -11,7 +11,10 @@ class UserController
      */
     public function deleteAccount(array $data = [])
     {
-        $sessionId = $_COOKIE['session_id'] ?? ($_SERVER['HTTP_SESSION_ID'] ?? null);
+        $sessionId = $_COOKIE['sid'] ?? $_COOKIE['session_id'] // legacy
+            ?? $_SERVER['HTTP_X_SESSION_ID']                       // header: X-Session-Id
+            ?? $_SERVER['HTTP_SESSION_ID']                         // legacy header
+            ?? null;
         if (!$sessionId) {
             http_response_code(401);
             echo json_encode(['error' => 'Non authentifié']);
