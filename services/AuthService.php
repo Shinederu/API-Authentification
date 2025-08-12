@@ -105,6 +105,22 @@ class AuthService
         return true;
     }
 
+    public function revokeRegister(string $token): bool
+    {
+        $record = $this->db->get('email_verification_tokens', ['user_id', 'expires_at'], [
+            'token' => $token
+        ]);
+
+        if (!$record)
+            return false;
+        if (strtotime($record['expires_at']) < time())
+            return false;
+
+        $this->db->delete('email_verification_tokens', ['user_id' => $record['user_id']]);
+        $this->db->delete('users', ['id' => $record['user_id']]);
+        return true;
+    }
+
 
     /**
      * Supprime un utilisateur et toutes ses données associées.
