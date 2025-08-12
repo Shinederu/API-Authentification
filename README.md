@@ -3,7 +3,7 @@ Authentification centralisée
 
 # Objectif
 Ci dessous se trouve la liste des objectifs de cet API, avec leur avancement respectifs
-- [ ] Inscription
+- [X] Inscription
     - [X] Vérification de l'Email
     - [X] Renvoyer l'Email de vérification en cas de tentative de login
     - [X] Annuler l'inscription
