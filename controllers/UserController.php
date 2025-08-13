@@ -1,7 +1,9 @@
 <?php
 
+require_once __DIR__ . '/../utils/sanitize.php';
 require_once __DIR__ . '/../services/SessionService.php';
 require_once __DIR__ . '/../services/AuthService.php';
+require_once __DIR__ . '/../services/ProfileService.php';
 
 class UserController
 {
@@ -50,6 +52,28 @@ class UserController
         setcookie('session_id', '', time() - 3600, '/', '.shinederu.lol', true, true);
 
         echo json_encode(['success' => true, 'message' => 'Compte supprimé et déconnecté']);
+    }
+
+
+    public function updateProfile(array $data, int $userId)
+    {
+
+        $array = sanitizeArray($data);
+        $username = $array['username'];
+
+        if (strlen($username) < 3) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Nom d’utilisateur trop court (minimum 4 caractères)']);
+            exit;
+        }
+
+        $profileService = new ProfileService();
+        if (!$profileService->updateProfile($userId, $username)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Nom d’utilisateur déjà pris']);
+            exit;
+        }
+        echo json_encode(['success' => true, 'message' => 'Profil mis à jour']);
     }
 }
 

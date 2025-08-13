@@ -26,4 +26,21 @@ function sanitizeVerifyEmailInput(array $data): array
     ];
 }
 
+function sanitizeArray(array $data): array
+{
+    $clean = [];
+
+    foreach ($data as $key => $value) {
+        if (is_array($value)) {
+            // Si c’est un sous-tableau, on le nettoie récursivement
+            $clean[$key] = sanitizeArray($value);
+        } else {
+            // Si c’est une valeur simple, on la nettoie
+            $clean[$key] = trim(htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8'));
+        }
+    }
+
+    return $clean;
+}
+
 ?>
