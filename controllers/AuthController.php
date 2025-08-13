@@ -26,7 +26,7 @@ class AuthController
 
         if (strlen($username) < 3) {
             http_response_code(400);
-            echo json_encode(['error' => 'Nom d’utilisateur trop court (minimum 3 caractères)']);
+            echo json_encode(['error' => 'Nom d’utilisateur trop court (minimum 4 caractères)']);
             exit;
         }
 

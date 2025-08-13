@@ -70,6 +70,10 @@ try {
                 case 'requestPasswordReset':
                     (new AuthController())->requestPasswordReset($body);
                     exit;
+                case 'updateProfile':
+                    $userId = AuthMiddleware::check();
+                    (new UserController())->updateProfile($body, $userId);
+                    exit;
                 default:
                     unknownAction('POST');
                     exit;
