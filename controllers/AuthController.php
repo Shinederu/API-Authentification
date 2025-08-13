@@ -15,11 +15,30 @@ class AuthController
         $username = $input['username'];
         $email = $input['email'];
         $password = $input['password'];
+        $passwordConfirm = $input['password_confirm'];
 
         // Validation classique
-        if (strlen($username) < 3 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 6) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
-            echo json_encode(['error' => 'Données invalides']);
+            echo json_encode(['error' => 'Adresse email invalide']);
+            exit;
+        }
+
+        if (strlen($username) < 3) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Nom d’utilisateur trop court (minimum 3 caractères)']);
+            exit;
+        }
+
+        if (strlen($password) <= 8) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Le mot de passe doit faire au moins 8 caractères']);
+            exit;
+        }
+
+        if ($password !== $passwordConfirm) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Les mots de passe ne correspondent pas']);
             exit;
         }
 

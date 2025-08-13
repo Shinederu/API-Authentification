@@ -6,6 +6,7 @@ function sanitizeRegisterInput(array $data): array
         'username' => trim(htmlspecialchars($data['username'] ?? '', ENT_QUOTES, 'UTF-8')),
         'email' => trim(htmlspecialchars($data['email'] ?? '', ENT_QUOTES, 'UTF-8')),
         'password' => $data['password'] ?? '',
+        'password_confirm' => $data['password_confirm'] ?? '',
     ];
 }
 

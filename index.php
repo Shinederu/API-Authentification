@@ -42,7 +42,7 @@ try {
                     (new AuthController())->revokeRegister($_GET);
                     exit;
                 case 'me':
-                     $userId =AuthMiddleware::check();
+                    $userId = AuthMiddleware::check();
                     (new AuthController())->me($userId);
                     exit;
                 default:
