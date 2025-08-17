@@ -62,8 +62,8 @@ class AuthController
 
         // Génère le token de vérif + envoie le mail
         $token = $auth->createEmailVerificationToken($userId);
-        $link = "https://auth.shinederu.lol/?action=verifyEmail&token=$token";
-        $link2 = "https://auth.shinederu.lol/?action=revokeRegister&token=$token";
+        $link = "https://shinederu.lol/newEmail?action=verifyEmail&token=$token";
+        $link2 = "https://shinederu.lol/newEmail?action=revokeRegister&token=$token";
 
         MailService::send(
             $email,
@@ -132,8 +132,8 @@ class AuthController
             $data = $auth->getEmailVerificationTokenByID($user['id']);
             $token = $data['token'];
             $email = $user['email'];
-            $link = "https://shinederu.lol/newEmail?token=$token&action=confirmEmailUpdate";
-            $link2 = "https://shinederu.lol/newEmail?token=$token&action=revokeRegister";
+            $link = "https://shinederu.lol/newEmail?action=verifyEmail&token=$token";
+            $link2 = "https://shinederu.lol/newEmail?action=revokeRegister&token=$token";
 
             MailService::send(
                 $email,
