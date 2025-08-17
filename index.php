@@ -31,16 +31,6 @@ try {
         case 'GET':
             $action = $_GET['action'] ?? null;
             switch ($action) {
-                case 'verifyEmail':
-                    (new AuthController())->verifyEmail($_GET);
-                    exit;
-                case 'updateEmail':
-                    AuthMiddleware::check();
-                    (new AuthController())->confirmEmailUpdate($body);
-                    exit;
-                case 'revokeRegister':
-                    (new AuthController())->revokeRegister($_GET);
-                    exit;
                 case 'me':
                     $userId = AuthMiddleware::check();
                     (new AuthController())->me($userId);
@@ -56,6 +46,12 @@ try {
                 case 'register':
                     (new AuthController())->register($body);
                     exit;
+                case 'verifyEmail':
+                    (new AuthController())->verifyEmail($body);
+                    exit;
+                case 'revokeRegister':
+                    (new AuthController())->revokeRegister($body);
+                    exit;
                 case 'login':
                     (new AuthController())->login($body);
                     exit;
@@ -69,6 +65,12 @@ try {
                     exit;
                 case 'requestPasswordReset':
                     (new AuthController())->requestPasswordReset($body);
+                    exit;
+                case 'confirmEmailUpdate':
+                    (new AuthController())->confirmEmailUpdate($body);
+                    exit;
+                case 'revokeEmailUpdate':
+                    (new AuthController())->revokeEmailUpdate($body);
                     exit;
                 case 'updateProfile':
                     $userId = AuthMiddleware::check();
@@ -85,9 +87,9 @@ try {
                 case 'resetPassword':
                     (new AuthController())->resetPassword($body);
                     exit;
-                case 'updateEmail':
-                    AuthMiddleware::check();
-                    (new AuthController())->requestEmailUpdate($body);
+                case 'requestEmailUpdate':
+                    $userId = AuthMiddleware::check();
+                    (new AuthController())->requestEmailUpdate($body, $userId);
                     exit;
                 default:
                     unknownAction('PUT');

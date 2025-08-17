@@ -30,7 +30,7 @@ class AuthController
             exit;
         }
 
-        if (strlen($password) <= 8) {
+        if (strlen($password) < 8) {
             http_response_code(400);
             echo json_encode(['error' => 'Le mot de passe doit faire au moins 8 caractères']);
             exit;
@@ -132,8 +132,8 @@ class AuthController
             $data = $auth->getEmailVerificationTokenByID($user['id']);
             $token = $data['token'];
             $email = $user['email'];
-            $link = "https://auth.shinederu.lol/?action=verifyEmail&token=$token";
-            $link2 = "https://auth.shinederu.lol/?action=revokeRegister&token=$token";
+            $link = "https://shinederu.lol/newEmail?token=$token&action=confirmEmailUpdate";
+            $link2 = "https://shinederu.lol/newEmail?token=$token&action=revokeRegister";
 
             MailService::send(
                 $email,
@@ -244,7 +244,7 @@ class AuthController
         }
 
         $token = $auth->createPasswordResetToken($user['id']);
-        $resetLink = "https://auth.shinederu.lol/?action=resetPassword?token=$token";
+        $resetLink = "https://shinederu.lol/newPassword?token=$token";
 
         // Envoie le mail
         MailService::send(
@@ -262,12 +262,14 @@ class AuthController
     public function resetPassword(array $data = [])
     {
         // Récupère le token et le nouveau mot de passe
-        $token = trim($data['token'] ?? $_REQUEST['token'] ?? '');
-        $newPassword = $data['password'] ?? $_REQUEST['password'] ?? '';
+        $token = trim($data['token']);
 
-        if (!$token || strlen($newPassword) < 6) {
+        $password = $data['password'];
+        $passwordConfirm = $data['passwordConfirm'];
+
+        if (!$token) {
             http_response_code(400);
-            echo json_encode(['error' => 'Paramètres invalides']);
+            echo json_encode(['error' => 'Token invalides']);
             exit;
         }
 
@@ -279,7 +281,19 @@ class AuthController
             exit;
         }
 
-        $auth->updatePassword($userId, $newPassword);
+        if (strlen($password) < 8) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Le mot de passe doit faire au moins 8 caractères']);
+            exit;
+        }
+
+        if ($password !== $passwordConfirm) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Les mots de passe ne correspondent pas']);
+            exit;
+        }
+
+        $auth->updatePassword($userId, $password);
         $auth->consumePasswordResetToken($token);
 
         $sessionService = new SessionService();
@@ -309,9 +323,18 @@ class AuthController
             exit;
         }
 
+        $oldEmail = $authService->getEmailByUserId($userId);
+
         // Génère un token de vérification email lié à l’update
         $token = $authService->createEmailVerificationToken($userId, $newEmail);
-        $link = "https://auth.shinederu.lol/?action=confirmEmailUpdate?token=$token";
+        $link = "https://shinederu.lol/newEmail?token=$token&action=confirmEmailUpdate";
+        $link2 = "https://shinederu.lol/newEmail?token=$token&action=revokeEmailUpdate";
+
+        MailService::send(
+            $oldEmail,
+            "Information de changement d’e-mail",
+            "Une demande de modification d'adresse email pour $newEmail a été effectuée. Si vous n'en êtes pas à l'origine ou que vous souhaitez l'annuler, utiliser le lien suivant : $link2"
+        );
 
         MailService::send(
             $newEmail,
@@ -319,12 +342,14 @@ class AuthController
             "Cliquez sur ce lien pour confirmer votre nouvelle adresse e-mail : $link"
         );
 
+
+
         echo json_encode(['success' => true, 'message' => 'Un mail de confirmation a été envoyé à la nouvelle adresse.']);
     }
 
-    public function confirmEmailUpdate(array $params)
+    public function confirmEmailUpdate(array $data)
     {
-        $token = trim($data['token'] ?? $_REQUEST['token'] ?? '');
+        $token = trim($data['token']);
 
         $authService = new AuthService();
         $record = $authService->getEmailVerificationToken($token);
@@ -342,6 +367,23 @@ class AuthController
         $authService->consumeEmailVerificationToken($token);
 
         echo json_encode(['success' => true, 'message' => 'Adresse e-mail modifiée et confirmée !']);
+    }
+
+    public function revokeEmailUpdate($data)
+    {
+        $token = trim($data['token']);
+        $authService = new AuthService();
+        $record = $authService->getEmailVerificationToken($token);
+
+        if (!$record || strtotime($record['expires_at']) < time() || empty($record['new_email'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Lien invalide ou expiré']);
+            exit;
+        }
+
+        $authService->consumeEmailVerificationToken($token);
+
+        echo json_encode(['success' => true, 'message' => 'Changement d\'adresse email annulé.']);
     }
 
     public function me($userId)

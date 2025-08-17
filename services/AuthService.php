@@ -212,7 +212,12 @@ class AuthService
 
     public function getEmailVerificationTokenByID(string $id)
     {
-        return $this->db->get('email_verification_tokens', '*', ['user_id' => $id],);
+        return $this->db->get('email_verification_tokens', '*', ['user_id' => $id], );
+    }
+
+    public function getEmailByUserId(string $userId)
+    {
+        return $this->db->get('users', 'email', ['id' => $userId]);
     }
 
     public function updateUserEmail(int $userId, string $newEmail): bool
