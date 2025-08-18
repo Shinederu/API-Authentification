@@ -61,7 +61,7 @@ class UserController
         $array = sanitizeArray($data);
         $username = $array['username'];
 
-        if (strlen($username) < 3) {
+        if (strlen($username) < 4) {
             http_response_code(400);
             echo json_encode(['error' => 'Nom d’utilisateur trop court (minimum 4 caractères)']);
             exit;

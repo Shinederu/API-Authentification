@@ -67,9 +67,13 @@ class AuthController
 
         MailService::send(
             $email,
-            "Vérification de votre compte",
-            "Bienvenue ! Merci pour votre inscription. Afin de verifier votre Email, merci de cliquer sur le lien suivant: $link \n \n Dans le cas où vous n'avez pas demandé a vous inscrire, vous pouvez annuler cette inscription via le lien suivant: $link2"
+            'verify_email_register',
+            [
+                'verify_link' => $link,
+                'revoke_link' => $link2,
+            ]
         );
+
 
         echo json_encode(['success' => true, 'message' => 'Inscription réussie, vérifiez votre email !']);
     }
@@ -137,8 +141,11 @@ class AuthController
 
             MailService::send(
                 $email,
-                "Vérification de votre compte",
-                "Bonjour, Afin de pouvoir vous connecter, merci de verifier votre Email en cliquant sur le lien suivant: $link \n \n Dans le cas où vous n'avez pas demandé à vous inscrire, vous pouvez annuler cette inscription via le lien suivant: $link2"
+                'verify_email_reminder',
+                [
+                    'verify_link' => $link,
+                    'revoke_link' => $link2,
+                ]
             );
             http_response_code(403);
             echo json_encode(['error' => 'Email non vérifié, un nouveau email vous a été transmis !']);
@@ -249,9 +256,12 @@ class AuthController
         // Envoie le mail
         MailService::send(
             $email,
-            "Modification de votre mot de passe",
-            "Pour modifier votre mot de passe, cliquez sur ce lien : $resetLink"
+            'password_reset_request',
+            [
+                'reset_link' => $resetLink,
+            ]
         );
+
 
         echo json_encode(['success' => true, 'message' => 'Si un compte existe, un mail a été envoyé.']);
     }
@@ -332,15 +342,21 @@ class AuthController
 
         MailService::send(
             $oldEmail,
-            "Information de changement d’e-mail",
-            "Une demande de modification d'adresse email pour $newEmail a été effectuée. Si vous n'en êtes pas à l'origine ou que vous souhaitez l'annuler, utiliser le lien suivant : $link2"
+            'email_update_notice_old',
+            [
+                'new_email' => $newEmail,
+                'revoke_link' => $link2,
+            ]
         );
 
         MailService::send(
             $newEmail,
-            "Confirmation de changement d’e-mail",
-            "Cliquez sur ce lien pour confirmer votre nouvelle adresse e-mail : $link"
+            'email_update_confirm_new',
+            [
+                'confirm_link' => $link,
+            ]
         );
+
 
 
 
