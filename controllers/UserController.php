@@ -67,6 +67,12 @@ class UserController
             exit;
         }
 
+        if (strlen($username) > 64) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Nom d’utilisateur trop long (maximum 64 caractères)']);
+            exit;
+        }
+
         $profileService = new ProfileService();
         if (!$profileService->updateProfile($userId, $username)) {
             http_response_code(400);
