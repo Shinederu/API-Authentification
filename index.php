@@ -1,9 +1,15 @@
 <?php
+// Load environment variables
+require_once __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 require_once('controllers/AuthController.php');
 require_once('controllers/UserController.php');
 require_once('middlewares/CorsMiddleware.php');
 require_once('middlewares/AuthMiddleware.php');
 CorsMiddleware::apply();
+
 
 header('Content-Type: application/json; charset=utf-8');
 
