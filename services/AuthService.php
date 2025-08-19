@@ -132,12 +132,21 @@ class AuthService
     }
 
     /**
-     * Récupère un utilisateur par son ID.
+     * Récupère les données utilisateur par son ID.
      * Retourne l'utilisateur ou false si non trouvé.
      */
     public function getUserById($userId)
     {
-        return $this->db->get('users', '*', ['id' => $userId]);
+        return $this->db->get('users', [
+            'id',
+            'username',
+            'email',
+            'avatar_url',
+            'role',
+            'created_at'
+        ], [
+            'id' => $userId
+        ]);
     }
 
 

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../utils/sanitize.php';
 require_once __DIR__ . '/../services/AuthService.php';
+require_once __DIR__ . '/../services/ProfileService.php';
 require_once __DIR__ . '/../services/MailService.php';
 require_once __DIR__ . '/../services/SessionService.php';
 
@@ -65,6 +66,11 @@ class AuthController
         // Récupère l’ID nouvellement créé
         $db = DatabaseService::getInstance();
         $userId = $db->id();
+
+        $url = "https://ui-avatars.com/api/?name={$username}&bold=true&size=" . 256;
+        $profile = new ProfileService();
+        $profile->setDefaultAvatarUrl($userId, $url);
+
 
         // Génère le token de vérif + envoie le mail
         $token = $auth->createEmailVerificationToken($userId);

@@ -41,6 +41,9 @@ try {
                     $userId = AuthMiddleware::check();
                     (new AuthController())->me($userId);
                     exit;
+                case 'getAvatar':
+                    (new UserController())->getAvatar($_GET);
+                    exit;
                 default:
                     unknownAction('GET');
                     exit;
@@ -81,6 +84,10 @@ try {
                 case 'updateProfile':
                     $userId = AuthMiddleware::check();
                     (new UserController())->updateProfile($body, $userId);
+                    exit;
+                case 'updateAvatar':
+                    $userId = AuthMiddleware::check();
+                    (new UserController())->updateAvatar($body, $userId);
                     exit;
                 default:
                     unknownAction('POST');
